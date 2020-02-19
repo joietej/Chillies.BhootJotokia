@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Xml.Linq;
 
 namespace Chillies.BhootJotokia.Extensions
@@ -9,7 +10,7 @@ namespace Chillies.BhootJotokia.Extensions
            elemnt.Attribute(XName.Get(name)).Value;
 
         public static float AtrAsFloat(this XElement elemnt, string name) =>
-            float.TryParse(elemnt.Attribute(XName.Get(name)).Value, out var value)
+            float.TryParse(elemnt.Attribute(XName.Get(name)).Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var value)
             ? value
             : default;
 
