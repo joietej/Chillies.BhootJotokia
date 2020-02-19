@@ -19,6 +19,13 @@ namespace Chillies.BhootJotokia.Test
 
             // Assert
             actual.Should().NotBeNull();
+            actual.RootX.Should().NotBe(default(float));
+            actual.RootY.Should().NotBe(default(float));
+            actual.InitialCameraX.Should().NotBe(default(float));
+            actual.InitialCameraY.Should().NotBe(default(float));
+            actual.OriginalDocumentHeight.Should().NotBe(default(int));
+            actual.OriginalDocumentWidth.Should().NotBe(default(int));
+            actual.BackgroundColor.Should().NotBe(default(int));
         }
 
         [Fact]
