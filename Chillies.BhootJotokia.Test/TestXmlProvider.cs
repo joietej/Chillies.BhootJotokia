@@ -19,13 +19,26 @@ namespace Chillies.BhootJotokia.Test
 
             // Assert
             actual.Should().NotBeNull();
-            actual.RootX.Should().NotBe(default(float));
-            actual.RootY.Should().NotBe(default(float));
-            actual.InitialCameraX.Should().NotBe(default(float));
-            actual.InitialCameraY.Should().NotBe(default(float));
-            actual.OriginalDocumentHeight.Should().NotBe(default(int));
-            actual.OriginalDocumentWidth.Should().NotBe(default(int));
-            actual.BackgroundColor.Should().NotBe(default(int));
+
+            actual.RootX.Should().NotBe(default);
+            actual.RootY.Should().NotBe(default);
+            actual.InitialCameraX.Should().NotBe(default);
+            actual.InitialCameraY.Should().NotBe(default);
+            actual.OriginalDocumentHeight.Should().NotBe(default);
+            actual.OriginalDocumentWidth.Should().NotBe(default);
+            actual.BackgroundColor.Should().NotBe(default);
+
+            actual.Panels.Should().HaveCount(1);
+
+            var rootPanel = actual.Panels[0];
+
+            rootPanel.Should().NotBeNull();
+            rootPanel.PanelId.Should().NotBeEmpty();
+            rootPanel.PanelName.Should().NotBeEmpty();
+            rootPanel.PanelHeight.Should().NotBe(default);
+            rootPanel.PanelWidth.Should().NotBe(default);
+            rootPanel.AttachedPanels.Should().HaveCount(4);
+            rootPanel.AttachedPanels[0].AttachedPanels.Should().HaveCount(2);
         }
 
         [Fact]

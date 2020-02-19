@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Chillies.BhootJotokia.Extensions;
+using System;
+using System.Runtime.CompilerServices;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
@@ -32,7 +35,8 @@ namespace Chillies.BhootJotokia.Models
                 bool loopSequence = false,
                 int initialCameraTargetX = 0,
                 int initialCameraTargetY = 0,
-                int initialCameraTargetZ = 0)
+                int initialCameraTargetZ = 0,
+                Panel[]? panels = null)
         {
             this.EnableEffects = enableEffects;
             this.DebugMode = debugMode;
@@ -57,6 +61,7 @@ namespace Chillies.BhootJotokia.Models
             this.InitialCameraTargetX = initialCameraTargetX;
             this.InitialCameraTargetY = initialCameraTargetY;
             this.InitialCameraTargetZ = initialCameraTargetZ;
+            this.Panels = panels ?? new Panel[] { };
         }
 
         public bool EnableEffects { get; }
@@ -83,25 +88,26 @@ namespace Chillies.BhootJotokia.Models
         public int InitialCameraTargetY { get; }
         public int InitialCameraTargetZ { get; }
 
+        public Panel[] Panels { get; }
+
         public XmlSchema? GetSchema()
         {
             return null;
         }
 
-        public unsafe void ReadXml(XmlReader reader)
+        public void ReadXml(XmlReader reader)
         {
-            fixed (Folding* t = &this)
-            {
-                *t = new Folding(
-                       float.Parse(reader.GetAttribute("rootX")),
-                       float.Parse(reader.GetAttribute("rootY")),
-                       int.Parse(reader.GetAttribute("originalDocumentHeight")),
-                       int.Parse(reader.GetAttribute("originalDocumentWidth")),
-                       float.Parse(reader.GetAttribute("initialCameraX")),
-                       float.Parse(reader.GetAttribute("initialCameraY")),
-                       int.Parse(reader.GetAttribute("backgroundColor")),
-                       int.Parse(reader.GetAttribute("initialCameraRadius")));
-            }
+            var root = XElement.Load(reader);
+
+            (Unsafe.AsRef(this)) = (new Folding(root.AtrAsFloat("rootX"),
+                                                root.AtrAsFloat("rootY"),
+                                                root.AtrAsInt("originalDocumentHeight"),
+                                                root.AtrAsInt("originalDocumentWidth"),
+                                                root.AtrAsFloat("initialCameraX"),
+                                                root.AtrAsFloat("initialCameraY"),
+                                                root.AtrAsInt("backgroundColor"),
+                                                root.AtrAsInt("initialCameraRadius"),
+                                                panels: Panel.Load(root, "panels")));
         }
 
         public void WriteXml(XmlWriter writer)
