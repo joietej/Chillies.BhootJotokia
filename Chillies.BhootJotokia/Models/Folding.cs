@@ -1,9 +1,13 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace Chillies.BhootJotokia.Models
 {
+    [Serializable]
     [XmlRoot(ElementName = "folding")]
-    public readonly struct Folding
+    public struct Folding : IXmlSerializable
     {
         public Folding(
                 float rootX,
@@ -56,27 +60,61 @@ namespace Chillies.BhootJotokia.Models
         }
 
         public bool EnableEffects { get; }
+
         public bool DebugMode { get; }
+
         public bool ShowStats { get; }
         public bool CalculatePanelCollisions { get; }
         public bool AllowMouseInteraction { get; }
         public bool AdjustCameraTargetPosition { get; }
         public bool FreeCamera { get; }
         public int? StartPosition { get; }
+
         public float InitialCameraX { get; }
+
         public float InitialCameraY { get; }
+
         public bool Show3DStats { get; }
         public int BackgroundColor { get; }
+
         public float RootX { get; }
+
         public float RootY { get; }
+
         public int OriginalDocumentHeight { get; }
+
         public int OriginalDocumentWidth { get; }
+
         public int InitialCameraRadius { get; }
+
         public string? IconSetID { get; }
         public bool AutoPlaySequence { get; }
         public bool LoopSequence { get; }
         public int InitialCameraTargetX { get; }
         public int InitialCameraTargetY { get; }
         public int InitialCameraTargetZ { get; }
+
+        public XmlSchema? GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            this = new Folding(
+                   float.Parse(reader.GetAttribute("rootX")),
+                   float.Parse(reader.GetAttribute("rootY")),
+                   int.Parse(reader.GetAttribute("originalDocumentHeight")),
+                   int.Parse(reader.GetAttribute("originalDocumentWidth")),
+                   float.Parse(reader.GetAttribute("initialCameraX")),
+                   float.Parse(reader.GetAttribute("initialCameraY")),
+                   int.Parse(reader.GetAttribute("backgroundColor")),
+                   int.Parse(reader.GetAttribute("initialCameraRadius")));
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
