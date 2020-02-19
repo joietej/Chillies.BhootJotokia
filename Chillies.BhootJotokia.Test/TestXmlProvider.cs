@@ -1,7 +1,6 @@
 using Chillies.BhootJotokia.Core;
 using Chillies.BhootJotokia.Models;
 using FluentAssertions;
-using System;
 using System.IO;
 using Xunit;
 
@@ -30,7 +29,6 @@ namespace Chillies.BhootJotokia.Test
 
             // Act & Assert
             await Assert.ThrowsAsync<FileNotFoundException>(async () => await new XmlProvider().LoadXmlAsAsync<Folding>(path));
-
         }
     }
 }
