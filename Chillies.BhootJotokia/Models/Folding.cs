@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Chillies.BhootJotokia.Models
 {
-    readonly struct Light
+    readonly struct Folding
     {
 
     }

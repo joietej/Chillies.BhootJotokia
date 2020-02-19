@@ -6,17 +6,8 @@ namespace Chillies.BhootJotokia
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("🌶🌶🌶🌶🌶");
         }
     }
 
-
-    readonly struct Point
-    {
-        public int X { get; }
-        public int Y { get; }
-
-        public Point(int x, int y) => (this.X, this.Y) = (x, y);
-
-    }
 }
