@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Chillies.BhootJotokia.Models
+﻿namespace Chillies.BhootJotokia.Models
 {
-    readonly struct Light
+    public readonly struct Light
     {
-
     }
 }
