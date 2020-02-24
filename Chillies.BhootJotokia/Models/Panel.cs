@@ -19,7 +19,7 @@ namespace Chillies.BhootJotokia.Models
                 float initialRot = 0,
                 float startRot = 0,
                 float endRot = 0,
-                float hingeOffset = 0,                
+                float hingeOffset = 0,
                 float creaseBottom = 0,
                 float creaseTop = 0,
                 float creaseLeft = 0,
