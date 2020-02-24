@@ -13,13 +13,13 @@ namespace Chillies.BhootJotokia.Models
                 string panelName,
                 float panelWidth,
                 float panelHeight,
+                int attachedToSide,
                 float minRot = 0,
                 float maxRot = 0,
                 float initialRot = 0,
                 float startRot = 0,
                 float endRot = 0,
-                float hingeOffset = 0,
-                int attachedToSide = 0,
+                float hingeOffset = 0,                
                 float creaseBottom = 0,
                 float creaseTop = 0,
                 float creaseLeft = 0,
@@ -75,6 +75,7 @@ namespace Chillies.BhootJotokia.Models
                                       p.Atr("panelName"),
                                       p.AtrAsFloat("panelWidth"),
                                       p.AtrAsFloat("panelHeight"),
+                                      p.AtrAsInt("attachedToSide"),
                                       attachedPanels: Panel.Load(p, "attachedPanels")))
               .ToArray();
     }
