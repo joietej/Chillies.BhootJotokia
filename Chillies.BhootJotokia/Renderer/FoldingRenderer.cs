@@ -1,5 +1,9 @@
 ﻿using Chillies.BhootJotokia.Models;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace Chillies.BhootJotokia.Renderer
 {
@@ -15,41 +19,67 @@ namespace Chillies.BhootJotokia.Renderer
 
             var (rootX, rootY) = (folding.RootX - (rootPanel.PanelWidth / 2), folding.RootY - rootPanel.PanelHeight);
 
-            RenderPanel(canvas, rootX, rootY, rootPanel.PanelWidth, rootPanel.PanelHeight, rootPanel.AttachedPanels, 2, 1);
+            canvas.TranslateTransform(rootX, rootY);
+
+            canvas.DrawRectangle(new Pen(Color.Blue), 0, 0, rootPanel.PanelWidth, rootPanel.PanelHeight);
+
+            RenderChildPanels(canvas, rootPanel, new Stack<GraphicsState>(new[] { canvas.Save() }));
 
             return img;
         }
 
-        private void RenderPanel(Graphics canvas, float x, float y, float panelWidth, float panelHeight, Panel[] attachedPanels, int maxlevel, int clevel)
+        private void RenderChildPanels(Graphics g, Panel p, Stack<GraphicsState> parentStates)
         {
-            canvas.DrawRectangle(new Pen(Brushes.Blue), x, y, panelWidth, panelHeight);
-
-            if (clevel == maxlevel) return;
-
-            foreach (var childPanel in attachedPanels)
+            foreach (var childPanel in p.AttachedPanels)
             {
-                var (nx, ny, width, height) = getChildPanelDimentions(childPanel.AttachedToSide, x, y, (int)childPanel.PanelWidth, (int)childPanel.PanelHeight, (int)panelWidth, (int)panelHeight);
-
-                RenderPanel(canvas, nx, ny, width, height, childPanel.AttachedPanels, maxlevel, clevel + 1);
+                childPanel.AttachedToSide switch
+                {
+                    1 => DrawRightPanel(g, p, childPanel),
+                    2 => DrawTopPanel(g, p, childPanel),
+                    3 => DrawLeftPanel(g, p, childPanel),
+                    0 => DrawBasePanel(g, p, childPanel),
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(childPanel.AttachedToSide))
+                };
             }
         }
 
-        private (float x, float y, float width, float height) getChildPanelDimentions(int attachedSide,
-                                                                float rootX,
-                                                                float rootY,
-                                                                float width,
-                                                                float height,
-                                                                float parentWidth,
-                                                                float parentHeight)
+        private void DrawLeftPanel(Graphics g, Panel p, Panel childPanel)
         {
-            return attachedSide switch
+            //g.TranslateTransform(p.Width, 0);
+
+            g.DrawRectangle(new Pen(Color.Orange), 0, 0, childPanel.PanelWidth, childPanel.PanelHeight);
+
+            if (childPanel.AttachedPanels?.Any() == true)
             {
-                1 => (rootX + parentWidth, rootY, height, width),
-                2 => (rootX, (rootY - height), width, height),
-                3 => (rootX - height, rootY, height, width),
-                0 => (rootX, rootY + parentHeight, width, height),
-                _ => throw new System.ArgumentOutOfRangeException(nameof(attachedSide))
-            };
+                g.RotateTransform(90F);
+                //g.TranslateTransform(0, -childPanel.Height);
+            }
+
+        }
+
+        private void DrawBasePanel(Graphics g, Panel p, Panel childPanel)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void DrawTopPanel(Graphics g, Panel p, Panel childPanel)
+        {
+            g.TranslateTransform(0, -childPanel.PanelHeight);
+
+            g.DrawRectangle(new Pen(Color.Blue), 0, 0, childPanel.PanelWidth, childPanel.PanelHeight);
+        }
+
+        private static void DrawRightPanel(Graphics g, Panel p, Panel childPanel)
+        {
+            g.TranslateTransform(p.PanelWidth, 0);
+
+            if (childPanel.AttachedPanels?.Any() == true)
+            {
+                g.RotateTransform(90F);
+                g.TranslateTransform(0, -childPanel.PanelHeight);
+            }
+
+            g.DrawRectangle(new Pen(Color.Green), 0, 0, childPanel.PanelWidth, childPanel.PanelHeight);
         }
     }
 }
