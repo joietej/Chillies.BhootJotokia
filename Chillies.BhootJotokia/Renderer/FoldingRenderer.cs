@@ -1,5 +1,4 @@
 ﻿using Chillies.BhootJotokia.Models;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -21,101 +20,108 @@ namespace Chillies.BhootJotokia.Renderer
 
             canvas.TranslateTransform(rootX, rootY);
 
-            canvas.DrawRectangle(new Pen(Color.Blue), 0, 0, rootPanel.PanelWidth, rootPanel.PanelHeight);
-
-            var rootState = canvas.Save();
-
-            RenderChildPanels(canvas, rootPanel, new Stack<GraphicsState>(new[] { rootState }), rootState);
+            RenderPanel(canvas, rootPanel, null, new Stack<GraphicsState>());
 
             return img;
         }
 
-        private void RenderChildPanels(Graphics canvas, Panel parentPanel, Stack<GraphicsState> parentStates, GraphicsState rootState)
+        private void RenderPanel(Graphics canvas, Panel panel, Panel? parent, Stack<GraphicsState> parentStates)
         {
-            foreach (var childPanel in parentPanel.AttachedPanels)
+            var currentState = DrawPanel(canvas, panel, parent);
+
+            if (panel.AttachedPanels?.Any() == true)
             {
-                switch (childPanel.AttachedToSide)
+                foreach (var childPanel in panel.AttachedPanels)
                 {
-                    case 1:
-                        DrawRightPanel(canvas, parentPanel, childPanel);
-                        break;
+                    parentStates.Push(currentState);
 
-                    case 2:
-                        DrawTopPanel(canvas, parentPanel, childPanel);
-                        break;
+                    RenderPanel(canvas, childPanel, panel, parentStates);
 
-                    case 3:
-                        DrawLeftPanel(canvas, parentPanel, childPanel);
-                        break;
-
-                    case 0:
-                        DrawBasePanel(canvas, parentPanel, childPanel);
-                        break;
-
-                    default:
-                        throw new System.ArgumentOutOfRangeException(nameof(childPanel.AttachedToSide));
-                };
-
-                parentStates.Push(canvas.Save());
-
-                if (childPanel.AttachedPanels?.Any() == true)
-                {
-                    RenderChildPanels(canvas, childPanel, parentStates, rootState);
-                }
-                else
-                {
-                    parentStates.Pop();
-                }
-
-                if (parentStates.Any())
-                {
-                    canvas.Restore(parentStates.Pop());
-                }
-                else
-                {
-                    canvas.Restore(rootState);
+                    if (parentStates.Any())
+                    {
+                        canvas.Restore(parentStates.Pop());
+                    }
                 }
             }
         }
 
-        private void DrawLeftPanel(Graphics canvas, Panel parentPanel, Panel childPanel)
+        private GraphicsState DrawPanel(Graphics canvas, Panel panel, Panel? parent)
         {
-            //g.TranslateTransform(p.Width, 0);
+            GraphicsState current;
 
-            canvas.DrawRectangle(new Pen(Color.Orange), 0, 0, childPanel.PanelWidth, childPanel.PanelHeight);
+            if (parent == null)
+            {
+                current = DrawRootPanel(canvas, panel);
+            }
+            else
+            {
+                current = panel.AttachedToSide switch
+                {
+                    1 => DrawRightPanel(canvas, panel, parent.Value),
+                    2 => DrawTopPanel(canvas, panel, parent.Value),
+                    3 => DrawLeftPanel(canvas, panel, parent.Value),
+                    0 => DrawDownPanel(canvas, panel, parent.Value),
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(panel.AttachedToSide))
+                };
+            }
 
-            if (childPanel.AttachedPanels?.Any() == true)
+            return current;
+        }
+
+        private GraphicsState DrawRootPanel(Graphics canvas, Panel panel)
+        {
+            
+            canvas.DrawRectangle(new Pen(Color.Blue), 0, 0, panel.PanelWidth, panel.PanelHeight);
+
+            return canvas.Save();
+        }
+
+        private GraphicsState DrawLeftPanel(Graphics canvas, Panel panel, Panel parentPanel)
+        {
+            canvas.TranslateTransform(-panel.PanelWidth, 0);
+
+            canvas.DrawRectangle(new Pen(Color.Orange), 0, 0, panel.PanelWidth, panel.PanelHeight);
+
+            if (panel.AttachedPanels?.Any() == true)
             {
                 canvas.RotateTransform(90F);
-                //g.TranslateTransform(0, -childPanel.Height);
+                canvas.TranslateTransform(panel.PanelHeight,0);
             }
+
+            return canvas.Save();
         }
 
-        private void DrawBasePanel(Graphics canvas, Panel parentPanel, Panel childPanel)
+        private GraphicsState DrawDownPanel(Graphics canvas, Panel panel, Panel parentPanel)
         {
-            canvas.TranslateTransform(0, childPanel.PanelHeight);
+            canvas.TranslateTransform(0, panel.PanelHeight);
 
-            canvas.DrawRectangle(new Pen(Color.Yellow), 0, 0, childPanel.PanelWidth, childPanel.PanelHeight);
+            canvas.DrawRectangle(new Pen(Color.Yellow), 0, 0, panel.PanelWidth, panel.PanelHeight);
+
+            return canvas.Save();
         }
 
-        private static void DrawTopPanel(Graphics canvas, Panel parentPanel, Panel childPanel)
+        private GraphicsState DrawTopPanel(Graphics canvas, Panel panel, Panel parentPanel)
         {
-            canvas.TranslateTransform(0, -childPanel.PanelHeight);
+            canvas.TranslateTransform(0, -panel.PanelHeight);
 
-            canvas.DrawRectangle(new Pen(Color.Blue), 0, 0, childPanel.PanelWidth, childPanel.PanelHeight);
+            canvas.DrawRectangle(new Pen(Color.Blue), 0, 0, panel.PanelWidth, panel.PanelHeight);
+
+            return canvas.Save();
         }
 
-        private static void DrawRightPanel(Graphics canvas, Panel parentPanel, Panel childPanel)
+        private GraphicsState DrawRightPanel(Graphics canvas, Panel panel, Panel parentPanel)
         {
             canvas.TranslateTransform(parentPanel.PanelWidth, 0);
 
-            if (childPanel.AttachedPanels?.Any() == true)
+            if (panel.AttachedPanels?.Any() == true)
             {
                 canvas.RotateTransform(90F);
-                canvas.TranslateTransform(0, -childPanel.PanelHeight);
+                canvas.TranslateTransform(0, -panel.PanelHeight);
             }
 
-            canvas.DrawRectangle(new Pen(Color.Green), 0, 0, childPanel.PanelWidth, childPanel.PanelHeight);
+            canvas.DrawRectangle(new Pen(Color.Green), 0, 0, panel.PanelWidth, panel.PanelHeight);
+
+            return canvas.Save();
         }
     }
 }
